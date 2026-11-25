@@ -47,10 +47,11 @@ test('deletes an existing expense and returns 404 for an unknown ID',async(t)=>{
   await withServer(t,async base=>{
     const created=await fetch(base+'/api/expenses',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({title:'Books',amount:500})});
     assert.equal(created.status,201);
-    const deleted=await fetch(base+'/api/expenses/1',{method:'DELETE'});
+    const item=await created.json();
+    const deleted=await fetch(base+'/api/expenses/'+item.id,{method:'DELETE'});
     assert.equal(deleted.status,200);
     assert.deepEqual(await deleted.json(),{deleted:true});
-    const missing=await fetch(base+'/api/expenses/1',{method:'DELETE'});
+    const missing=await fetch(base+'/api/expenses/'+item.id,{method:'DELETE'});
     assert.equal(missing.status,404);
     assert.deepEqual(await missing.json(),{error:'not found'});
     assert.equal((await (await fetch(base+'/api/expenses')).json()).length,0);
