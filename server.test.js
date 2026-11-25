@@ -22,9 +22,13 @@ test('expense creation trims title, applies category default and lists records',
   await withServer(t,async base=>{
     const response=await fetch(base+'/api/expenses',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({title:'  Travel  ',amount:250})});
     assert.equal(response.status,201);
-    assert.deepEqual(await response.json(),{id:1,title:'Travel',amount:250,category:'Other'});
+    const created=await response.json();
+    assert.equal(created.title,'Travel');
+    assert.equal(created.amount,250);
+    assert.equal(created.category,'Other');
+    assert.ok(Number.isInteger(created.id));
     const list=await fetch(base+'/api/expenses');
-    assert.equal((await list.json()).length,1);
+    assert.deepEqual(await list.json(),[created]);
   });
 });
 
