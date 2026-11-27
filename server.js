@@ -30,6 +30,10 @@ function createServer({ dataFile = process.env.EXPENSES_FILE || path.join(__dirn
 
   return http.createServer((req, res) => {
     const url = new URL(req.url, 'http://localhost');
+    if (req.method === 'GET' && url.pathname === '/') {
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      return res.end(fs.readFileSync(path.join(__dirname, 'public', 'index.html')));
+    }
     if (req.method === 'GET' && url.pathname === '/health') {
       return reply(res, 200, { status: 'ok' });
     }
