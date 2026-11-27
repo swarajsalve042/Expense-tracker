@@ -21,7 +21,7 @@ test('browser interface is served at the root URL', async t => {
   await withServer(t, async base => {
     const response = await fetch(base + '/');
     assert.equal(response.status, 200);
-    assert.match(response.headers.get('content-type'), /text\\/html/);
+    assert.ok(response.headers.get('content-type').includes('text/html'));
     assert.match(await response.text(), /Expense Tracker/);
   });
 });
