@@ -1,5 +1,7 @@
 # Expense Tracker Web Application
 
+[![ci](https://github.com/swarajsalve042/Expense-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/swarajsalve042/Expense-tracker/actions/workflows/ci.yml)
+
 [![CI](https://github.com/swarajsalve042/Expense-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/swarajsalve042/Expense-tracker/actions/workflows/ci.yml)
 
 Dependency-free Node.js REST API for recording expenses.
@@ -28,3 +30,9 @@ Endpoints:
 
 ## Scope
 This API uses in-memory storage; records reset when the process restarts. Browser UI, accounts, persistent database, budgets and charts are future enhancements.
+
+## Latest automated verification (25 November 2026)
+
+- [Node.js API tests — successful GitHub Actions run](https://github.com/swarajsalve042/Expense-tracker/actions/runs/45576392650)
+
+These links document automated checks only; they do not imply production deployment or manual end-user acceptance testing.
