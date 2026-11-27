@@ -17,6 +17,15 @@ async function withServer(t, run) {
   await run('http://127.0.0.1:' + server.address().port, dataFile);
 }
 
+test('browser interface is served at the root URL', async t => {
+  await withServer(t, async base => {
+    const response = await fetch(base + '/');
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get('content-type'), /text\\/html/);
+    assert.match(await response.text(), /Expense Tracker/);
+  });
+});
+
 test('health endpoint responds', async t => {
   await withServer(t, async base => {
     const response = await fetch(base + '/health');
