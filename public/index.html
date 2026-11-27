@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expense Tracker</title>
+  <style>
+    :root{font-family:system-ui,sans-serif;color:#172033;background:#f3f6fb}
+    *{box-sizing:border-box}body{margin:0;padding:28px 16px}.wrap{max-width:760px;margin:auto}
+    h1{margin:0 0 6px}.muted{color:#64748b}.panel{background:white;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin:18px 0;box-shadow:0 4px 18px #0f172a0a}
+    form{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px}input,select,button{font:inherit;padding:11px;border:1px solid #cbd5e1;border-radius:8px;min-width:0}
+    button{background:#1d4ed8;color:white;border:0;cursor:pointer}button.delete{background:#b91c1c;padding:7px 10px}
+    .summary{font-size:1.35rem;font-weight:700}.item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #e2e8f0}
+    .item:last-child{border:0}.amount{font-weight:650;white-space:nowrap}.error{color:#b91c1c;min-height:1.3em}
+    @media(max-width:620px){form{grid-template-columns:1fr 1fr}form input:first-child{grid-column:1/-1}form button{grid-column:1/-1}}
+  </style>
+</head>
+<body><main class="wrap">
+  <h1>Expense Tracker</h1><p class="muted">Record and review your expenses. Data is stored in a local JSON file on the server.</p>
+  <section class="panel"><div class="muted">Total recorded expenses</div><div class="summary" id="total">₹0.00</div><div class="muted" id="count">0 expenses</div></section>
+  <section class="panel"><h2>Add an expense</h2>
+    <form id="expense-form">
+      <input name="title" placeholder="Expense description" maxlength="120" required>
+      <input name="amount" type="number" min="0.01" step="0.01" placeholder="Amount (₹)" required>
+      <select name="category"><option>Other</option><option>Food</option><option>Travel</option><option>Shopping</option><option>Bills</option><option>Health</option><option>Education</option></select>
+      <button type="submit">Add expense</button>
+    </form><p class="error" id="message" role="status"></p>
+  </section>
+  <section class="panel"><h2>Recent expenses</h2><div id="expenses" class="muted">Loading…</div></section>
+</main>
+<script>
+const form=document.querySelector('#expense-form'), list=document.querySelector('#expenses'), message=document.querySelector('#message');
+const money=value=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR'}).format(value);
+async function refresh(){
+ const response=await fetch('/api/expenses');if(!response.ok)throw new Error('Unable to load expenses');
+ const items=await response.json();document.querySelector('#total').textContent=money(items.reduce((sum,x)=>sum+x.amount,0));
+ document.querySelector('#count').textContent=items.length+' expense'+(items.length===1?'':'s');
+ list.replaceChildren();
+ if(!items.length){list.textContent='No expenses yet. Add your first expense above.';return;}
+ for(const item of [...items].reverse()){
+  const row=document.createElement('div');row.className='item';
+  const details=document.createElement('div'), title=document.createElement('strong'), category=document.createElement('div');
+  title.textContent=item.title;category.className='muted';category.textContent=item.category;details.append(title,category);
+  const right=document.createElement('div'), amount=document.createElement('span'), remove=document.createElement('button');
+  right.style.display='flex';right.style.alignItems='center';right.style.gap='12px';amount.className='amount';amount.textContent=money(item.amount);
+  remove.className='delete';remove.textContent='Delete';remove.addEventListener('click',async()=>{const result=await fetch('/api/expenses/'+item.id,{method:'DELETE'});if(!result.ok){message.textContent='Could not delete this expense.';return;}await refresh();});
+  right.append(amount,remove);row.append(details,right);list.append(row);
+ }
+}
+form.addEventListener('submit',async event=>{
+ event.preventDefault();message.textContent='';const values=new FormData(form);
+ const response=await fetch('/api/expenses',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({title:values.get('title'),amount:values.get('amount'),category:values.get('category')})});
+ if(!response.ok){const error=await response.json();message.textContent=error.error||'Could not save expense.';return;}
+ form.reset();await refresh();
+});
+refresh().catch(()=>{list.textContent='Unable to connect to the expense service.';});
+</script></body></html>
