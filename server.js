@@ -77,7 +77,7 @@ function createServer({ dataFile = process.env.EXPENSES_FILE || path.join(__dirn
     }
     if (req.method === 'DELETE' && url.pathname.startsWith('/api/expenses/')) {
       const idText = url.pathname.split('/').pop();
-      if (!/^\\d+$/.test(idText)) return reply(res, 400, { error: 'invalid expense ID' });
+      if (!/^\d+$/.test(idText)) return reply(res, 400, { error: 'invalid expense ID' });
       const id = Number(idText);
       const index = expenses.findIndex(item => item.id === id);
       if (index < 0) return reply(res, 404, { error: 'not found' });
