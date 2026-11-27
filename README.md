@@ -1,38 +1,65 @@
 # Expense Tracker Web Application
 
-[![ci](https://github.com/swarajsalve042/Expense-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/swarajsalve042/Expense-tracker/actions/workflows/ci.yml)
-
 [![CI](https://github.com/swarajsalve042/Expense-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/swarajsalve042/Expense-tracker/actions/workflows/ci.yml)
 
-Dependency-free Node.js REST API for recording expenses.
+A dependency-free Node.js expense tracker with a responsive browser interface and a JSON-backed REST API.
 
 ## Features
-- Add and list expense records.
-- Delete an expense by ID.
-- Validate non-empty titles and positive amounts.
+
+- Add, list and delete expenses from the browser.
+- Show total spending and the number of recorded expenses.
+- Categorize expenses (Food, Travel, Shopping, Bills, Health, Education or Other).
+- Validate non-empty descriptions and positive finite amounts.
+- Persist records in a local JSON file across application restarts.
 - Health endpoint at `/health`.
 - Automated API tests using Node's built-in test runner.
 
 ## Requirements
+
 Node.js 22 or later.
 
-## Run
-`npm start`
+## Run locally
 
-Endpoints:
-- `GET /api/expenses`
-- `POST /api/expenses`
-- `DELETE /api/expenses/:id`
-- `GET /health`
+```bash
+npm start
+```
+
+Open http://localhost:3000 in your browser.
+
+By default, records are saved to `data/expenses.json`. Set `EXPENSES_FILE` to choose another file location. The `data/` directory is ignored by Git so personal records are not committed.
+
+## API
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/expenses` | List expenses |
+| POST | `/api/expenses` | Create an expense |
+| DELETE | `/api/expenses/:id` | Delete an expense |
+| GET | `/health` | Health check |
+| GET | `/` | Browser interface |
+
+Example request:
+
+```bash
+curl -X POST http://localhost:3000/api/expenses \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Groceries","amount":450,"category":"Food"}'
+```
 
 ## Test
-`npm test`
 
-## Scope
-This API uses in-memory storage; records reset when the process restarts. Browser UI, accounts, persistent database, budgets and charts are future enhancements.
+```bash
+npm test
+```
 
-## Latest automated verification (25 November 2026)
+Tests cover the browser route, health endpoint, expense creation/listing, input validation, deletion and persistence to the configured data file.
 
-- [Node.js API tests — successful GitHub Actions run](https://github.com/swarajsalve042/Expense-tracker/actions/runs/45576392650)
+## Architecture and limitations
 
-These links document automated checks only; they do not imply production deployment or manual end-user acceptance testing.
+The application uses Node.js built-in HTTP, filesystem and test modules; no third-party runtime dependencies are required. The JSON file is suitable for a local learning/demo application, not concurrent multi-user or production financial workloads. A database such as PostgreSQL or MySQL, authentication, authorization, backups, audit history, and deployment hardening are future enhancements.
+
+Do not store real financial or personal information in a publicly hosted demo.
+
+## CI evidence
+
+GitHub Actions runs the Node.js test suite on pushes and pull requests. The latest workflow status is shown by the badge at the top of this README. Successful automated tests demonstrate the tested application behavior; they are not evidence of a production deployment.
